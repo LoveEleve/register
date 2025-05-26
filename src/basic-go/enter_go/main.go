@@ -182,5 +182,37 @@ func getLoginCode(data ActivationData) string {
 	// 输出结果
 	fmt.Printf("HTTP状态码: %d\n", resp.StatusCode)
 	fmt.Printf("响应内容:\n%s\n", string(body))
+	AnalysisLoginCode(body)
 	return ""
+}
+
+type Activation struct {
+	ActivationID     string  `json:"activationId"`
+	ServiceCode      string  `json:"serviceCode"`
+	PhoneNumber      string  `json:"phoneNumber"`
+	ActivationCost   float64 `json:"activationCost"`
+	ActivationStatus string  `json:"activationStatus"`
+	ActivationTime   string  `json:"activationTime"`
+	CountryCode      string  `json:"countryCode"`
+	CountryName      string  `json:"countryName"`
+	CanGetAnotherSms string  `json:"canGetAnotherSms"`
+	Currency         int     `json:"currency"`
+	SmsCode          *string `json:"smsCode"` // 使用指针处理null
+	SmsText          *string `json:"smsText"` // 使用指针处理null
+}
+
+type ActivationResponse struct {
+	Status            string       `json:"status"`
+	ActiveActivations []Activation `json:"activeActivations"` // 确保字段名匹配
+}
+
+func AnalysisLoginCode(body []byte) ActivationResponse {
+	var result ActivationResponse
+	if err := json.Unmarshal(body, &result); err != nil {
+		panic(err)
+	}
+	// 获取activeActivations数组
+	activations := result.ActiveActivations
+	fmt.Printf("解析到%d个激活记录\n", len(activations))
+	return result
 }
